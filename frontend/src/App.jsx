@@ -1,25 +1,25 @@
-import React, { useState } from 'react'
-import TranscriptForm from './components/TranscriptForm'
-import ResultCard from './components/ResultCard'
-import { analyzeCall } from './api'
-import BatchUpload from "./components/BatchUpload";
+import React, { useState } from 'react';
+import TranscriptForm from './components/TranscriptForm';
+import ResultCard from './components/ResultCard';
+import BatchUpload from './components/BatchUpload';
+import { analyzeCall } from './api';
 
 export default function App() {
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
-  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   async function handleAnalyze(transcript) {
-    setError(null)
-    setResult(null)
-    setLoading(true)
+    setError(null);
+    setResult(null);
+    setLoading(true);
     try {
-      const res = await analyzeCall(transcript)
-      setResult(res)
+      const res = await analyzeCall(transcript);
+      setResult(res);
     } catch (err) {
-      setError(err.message || 'Unexpected error')
+      setError(err.message || "Unexpected error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -32,17 +32,18 @@ export default function App() {
       </aside>
 
       <main className="content">
-
-        {/* ---------------------- SINGLE CALL ANALYSIS ---------------------- */}
         <header className="topbar">
           <h1>Analyze Call Transcript</h1>
-          <p className="top-sub">Paste a transcript and get structured insights</p>
+          <p className="top-sub">
+            Paste a transcript or upload a CSV file for batch analysis
+          </p>
         </header>
 
         <section className="grid">
           <div className="col form-col">
             <TranscriptForm onAnalyze={handleAnalyze} loading={loading} />
             {error && <div className="error">{error}</div>}
+            <BatchUpload />
           </div>
 
           <div className="col results-col">
@@ -53,24 +54,10 @@ export default function App() {
           </div>
         </section>
 
-
-        {/* ---------------------- CSV BATCH UPLOAD ---------------------- */}
-        <section style={{ marginTop: "60px" }}>
-          <header className="topbar">
-            <h1>Batch Analyze (CSV Upload)</h1>
-            <p className="top-sub">
-              Upload a CSV with columns: <strong>id, transcript</strong>
-            </p>
-          </header>
-
-          <BatchUpload />
-        </section>
-
-
-        <footer className="footer" style={{ marginTop: "80px" }}>
+        <footer className="footer">
           <small>Built for evaluation — minimal, clean, and production-minded.</small>
         </footer>
       </main>
     </div>
-  )
+  );
 }

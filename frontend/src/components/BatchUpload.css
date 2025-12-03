@@ -1,0 +1,79 @@
+.batch-wrapper {
+  margin-top: 30px;
+}
+
+.batch-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 15px;
+  background: white;
+}
+
+.batch-table th {
+  text-align: left;
+  padding: 12px 10px;
+  background: #f7f7f9;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+}
+
+.batch-table td {
+  padding: 14px 10px;
+  vertical-align: top;
+  border-bottom: 1px solid #eee;
+}
+
+.transcript-text,
+.summary-text {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.details-btn {
+  color: #0366d6;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.details-btn:hover {
+  text-decoration: underline;
+}
+
+.id-col { width: 50px; }
+.intent-col { width: 200px; }
+.sentiment-col { width: 100px; }
+.action-col { width: 120px; }
+.summary-col { width: 300px; }
+.details-col { width: 80px; text-align: right; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: white;
+  padding: 20px 25px;
+  width: 500px;
+  border-radius: 10px;
+}
+
+.close-btn {
+  margin-top: 20px;
+  padding: 8px 14px;
+  background: #0366d6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
