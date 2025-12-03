@@ -1,130 +1,222 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
-import "./BatchUpload.css";
-import { analyzeCall } from "../api";
 
 export default function BatchUpload() {
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
 
-  function handleCSVUpload(e) {
+  const handleCSVUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: async (parsed) => {
-        const rows = parsed.data;
+      complete: async function (results) {
+        const data = results.data;
 
-        if (!rows.length || !rows[0].transcript) {
-          alert("No valid rows with a 'transcript' column found in CSV.");
+        if (!data.length || !data[0].transcript) {
+          alert("CSV must contain a 'transcript' column.");
           return;
         }
 
-        setLoading(true);
-        const batchResults = [];
+        const enriched = data.map((row, idx) => ({
+          id: row.id || idx + 1,
+          transcript: row.transcript,
+          status: "pending", // pending → processing → done
+          result: null
+        }));
 
-        for (let i = 0; i < rows.length; i++) {
-          const row = rows[i];
-          const transcript = row.transcript;
+        setRows(enriched);
+
+        // Process each transcript sequentially
+        for (let i = 0; i < enriched.length; i++) {
+          enriched[i].status = "processing";
+          setRows([...enriched]);
 
           try {
-            const res = await analyzeCall(transcript);
-            batchResults.push({
-              id: row.id || i + 1,
-              transcript,
-              ...res,
+            const res = await fetch("https://predixion-assignment-production.up.railway.app/analyze_call", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ transcript: enriched[i].transcript })
             });
-          } catch (err) {
-            batchResults.push({
-              id: row.id || i + 1,
-              transcript,
-              error: err.message,
-            });
-          }
-        }
 
-        setResults(batchResults);
-        setLoading(false);
-      },
+            const json = await res.json();
+            enriched[i].result = json.insights;
+            enriched[i].status = "done";
+          } catch (err) {
+            enriched[i].status = "failed";
+          }
+
+          setRows([...enriched]);
+        }
+      }
     });
-  }
+  };
+
+  const openRowDetails = (row) => setSelectedRow(row);
+  const closeModal = () => setSelectedRow(null);
+
+  const getStatusDot = (status) => {
+    switch (status) {
+      case "pending":
+        return <span style={dotStyle("#999")} />;
+      case "processing":
+        return <span style={dotStyle("#e0a800")} />;
+      case "done":
+        return <span style={dotStyle("#28a745")} />;
+      case "failed":
+        return <span style={dotStyle("#dc3545")} />;
+      default:
+        return <span style={dotStyle("#999")} />;
+    }
+  };
+
+  const dotStyle = (color) => ({
+    display: "inline-block",
+    width: "12px",
+    height: "12px",
+    borderRadius: "50%",
+    backgroundColor: color
+  });
 
   return (
-    <div className="batch-wrapper">
-      <h2>Batch Results</h2>
+    <div style={{ width: "100%", marginTop: "2rem" }}>
+      {/* File Upload */}
+      <div style={{ marginBottom: "1rem" }}>
+        <input type="file" accept=".csv" onChange={handleCSVUpload} />
+      </div>
 
-      <input type="file" accept=".csv" onChange={handleCSVUpload} />
+      <h2 style={{ marginBottom: "1rem" }}>Batch Results</h2>
 
-      {loading && <p>Processing transcripts... please wait.</p>}
-
-      {!loading && results.length > 0 && (
-        <table className="batch-table">
+      {/* Table Wrapper (full width + scrollable) */}
+      <div style={{ width: "100%", overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "900px" }}>
           <thead>
             <tr>
-              <th className="id-col">ID</th>
-              <th>Transcript</th>
-              <th className="intent-col">Intent</th>
-              <th className="sentiment-col">Sentiment</th>
-              <th className="action-col">Action Req.</th>
-              <th className="summary-col">Summary</th>
-              <th className="details-col">Details</th>
+              <th style={th}>ID</th>
+              <th style={th}>Transcript</th>
+              <th style={th}>Status</th>
+              <th style={th}>Intent</th>
+              <th style={th}>Sentiment</th>
+              <th style={th}>Action Req.</th>
+              <th style={th}>Summary</th>
+              <th style={th}>Details</th>
             </tr>
           </thead>
 
           <tbody>
-            {results.map((r, idx) => (
-              <tr key={idx}>
-                <td>{r.id}</td>
+            {rows.map((row) => (
+              <tr key={row.id}>
+                <td style={td}>{row.id}</td>
 
-                <td>
-                  <div className="transcript-text">
-                    {r.transcript.slice(0, 120)}...
+                <td style={td}>
+                  <div style={{ maxWidth: "260px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {row.transcript}
                   </div>
                 </td>
 
-                <td>{r.intent || "—"}</td>
-                <td>{r.sentiment || "—"}</td>
-                <td>{String(r.action_required)}</td>
+                <td style={{ ...td, textAlign: "center" }}>{getStatusDot(row.status)}</td>
 
-                <td>
-                  <div className="summary-text">
-                    {r.summary ? r.summary.slice(0, 130) : "—"}...
+                <td style={td}>{row.result?.customer_intent || "—"}</td>
+                <td style={td}>{row.result?.sentiment || "—"}</td>
+                <td style={td}>{String(row.result?.action_required) || "—"}</td>
+
+                <td style={td}>
+                  <div style={{ maxWidth: "260px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {row.result?.summary || "—"}
                   </div>
                 </td>
 
-                <td className="details-col">
-                  <span
-                    className="details-btn"
-                    onClick={() => setSelected(r)}
+                <td style={td}>
+                  <button
+                    onClick={() => openRowDetails(row)}
+                    style={{
+                      background: "none",
+                      color: "#007bff",
+                      border: "none",
+                      cursor: "pointer",
+                      textDecoration: "underline"
+                    }}
                   >
                     View
-                  </span>
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      )}
+      </div>
 
-      {selected && (
-        <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <h3>Details for ID {selected.id}</h3>
-            <p><strong>Transcript:</strong><br />{selected.transcript}</p>
-            <p><strong>Intent:</strong> {selected.intent}</p>
-            <p><strong>Sentiment:</strong> {selected.sentiment}</p>
-            <p><strong>Action Required:</strong> {String(selected.action_required)}</p>
-            <p><strong>Summary:</strong><br />{selected.summary}</p>
+      {/* Details Modal */}
+      {selectedRow && (
+        <div style={modalOverlay}>
+          <div style={modalBox}>
+            <h3>Transcript Details</h3>
+            <p><strong>ID:</strong> {selectedRow.id}</p>
+            <p><strong>Status:</strong> {selectedRow.status}</p>
 
-            <button onClick={() => setSelected(null)} className="close-btn">
-              Close
-            </button>
+            {selectedRow.result && (
+              <>
+                <p><strong>Intent:</strong> {selectedRow.result.customer_intent}</p>
+                <p><strong>Sentiment:</strong> {selectedRow.result.sentiment}</p>
+                <p><strong>Action Required:</strong> {String(selectedRow.result.action_required)}</p>
+                <p><strong>Summary:</strong> {selectedRow.result.summary}</p>
+              </>
+            )}
+
+            <p><strong>Transcript:</strong><br />{selectedRow.transcript}</p>
+
+            <button onClick={closeModal} style={modalClose}>Close</button>
           </div>
         </div>
       )}
     </div>
   );
 }
+
+// Styles
+const th = {
+  padding: "10px",
+  borderBottom: "2px solid #ccc",
+  textAlign: "left",
+  background: "#f7f7f7"
+};
+
+const td = {
+  padding: "10px",
+  borderBottom: "1px solid #ddd",
+  verticalAlign: "top"
+};
+
+// Modal styles
+const modalOverlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000
+};
+
+const modalBox = {
+  width: "450px",
+  background: "#fff",
+  padding: "20px",
+  borderRadius: "8px",
+  boxShadow: "0 0 10px rgba(0,0,0,0.3)"
+};
+
+const modalClose = {
+  marginTop: "1rem",
+  padding: "8px 16px",
+  backgroundColor: "#333",
+  color: "#fff",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer"
+};
