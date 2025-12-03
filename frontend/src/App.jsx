@@ -34,11 +34,10 @@ export default function App() {
       <main className="content">
         <header className="topbar">
           <h1>Analyze Call Transcript</h1>
-          <p className="top-sub">
-            Paste a transcript or upload a CSV file for batch analysis
-          </p>
+          <p className="top-sub">Paste a transcript or upload a CSV file for batch analysis</p>
         </header>
 
+        {/* SINGLE ANALYSIS SECTION */}
         <section className="analysis-grid">
           <div className="left-panel">
             <TranscriptForm onAnalyze={handleAnalyze} loading={loading} />
@@ -53,6 +52,11 @@ export default function App() {
           </div>
         </section>
 
+        {/* BATCH UPLOAD SECTION */}
+        <div style={{ marginTop: "40px" }}>
+          <h2 style={{ marginBottom: "12px" }}>Batch Upload</h2>
+          <BatchUpload />
+        </div>
 
         <footer className="footer">
           <small>Built for evaluation — minimal, clean, and production-minded.</small>
