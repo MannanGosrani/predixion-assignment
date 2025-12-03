@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import TranscriptForm from './components/TranscriptForm'
 import ResultCard from './components/ResultCard'
 import { analyzeCall } from './api'
+import BatchUpload from "./components/BatchUpload";
 
 export default function App() {
   const [loading, setLoading] = useState(false)
@@ -31,6 +32,8 @@ export default function App() {
       </aside>
 
       <main className="content">
+
+        {/* ---------------------- SINGLE CALL ANALYSIS ---------------------- */}
         <header className="topbar">
           <h1>Analyze Call Transcript</h1>
           <p className="top-sub">Paste a transcript and get structured insights</p>
@@ -50,7 +53,21 @@ export default function App() {
           </div>
         </section>
 
-        <footer className="footer">
+
+        {/* ---------------------- CSV BATCH UPLOAD ---------------------- */}
+        <section style={{ marginTop: "60px" }}>
+          <header className="topbar">
+            <h1>Batch Analyze (CSV Upload)</h1>
+            <p className="top-sub">
+              Upload a CSV with columns: <strong>id, transcript</strong>
+            </p>
+          </header>
+
+          <BatchUpload />
+        </section>
+
+
+        <footer className="footer" style={{ marginTop: "80px" }}>
           <small>Built for evaluation — minimal, clean, and production-minded.</small>
         </footer>
       </main>
