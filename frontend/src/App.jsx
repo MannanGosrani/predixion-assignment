@@ -39,20 +39,20 @@ export default function App() {
           </p>
         </header>
 
-        <section className="grid">
-          <div className="col form-col">
+        <section className="analysis-grid">
+          <div className="left-panel">
             <TranscriptForm onAnalyze={handleAnalyze} loading={loading} />
             {error && <div className="error">{error}</div>}
-            <BatchUpload />
           </div>
 
-          <div className="col results-col">
+          <div className="right-panel">
             <ResultCard record={result} />
             {!result && !loading && (
-              <div className="placeholder">Results will appear here</div>
+              <div className="placeholder">Insights will appear here</div>
             )}
           </div>
         </section>
+
 
         <footer className="footer">
           <small>Built for evaluation — minimal, clean, and production-minded.</small>

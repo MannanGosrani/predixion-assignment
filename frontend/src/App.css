@@ -40,3 +40,19 @@
 .read-the-docs {
   color: #888;
 }
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  gap: 32px;
+  width: 100%;
+}
+
+.left-panel {
+  width: 100%;
+}
+
+.right-panel {
+  width: 100%;
+  min-width: 320px;
+}

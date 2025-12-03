@@ -84,6 +84,7 @@ export default function BatchUpload() {
     <div style={{ width: "100%", marginTop: "2rem" }}>
       {/* File Upload */}
       <div style={{ marginBottom: "1rem" }}>
+        <h2 style={{ marginBottom: "8px" }}>Batch Upload</h2>
         <input type="file" accept=".csv" onChange={handleCSVUpload} />
       </div>
 
