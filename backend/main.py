@@ -38,8 +38,7 @@ logger = logging.getLogger("conversational-insights")
 
 # Google GenAI - new SDK
 from google import genai
-client = genai.Client(api_key=GEMINI_API_KEY))
-
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # --------- Pydantic Models ----------
 class CallInsight(BaseModel):
