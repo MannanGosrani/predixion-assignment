@@ -1,12 +1,12 @@
 const BASE =
   (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim()) ||
-  'http://127.0.0.1:8000';
+  "http://127.0.0.1:8000";
 
 export async function analyzeCall(transcript) {
-  const url = `${BASE}/analyze_call`;
+  const API_URL = "https://predixion-assignment-production.up.railway.app/analyze_call";
 
-  const res = await fetch(url, {
-    method: 'POST',
+  const res = await fetch(API_URL, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ transcript })
   });
