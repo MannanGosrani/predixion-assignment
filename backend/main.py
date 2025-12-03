@@ -7,7 +7,18 @@ from typing import Optional
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import asyncpg
+
+app = FastAPI(title="Conversational Insights Generator")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],    
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load env vars
 load_dotenv()
@@ -27,7 +38,7 @@ logger = logging.getLogger("conversational-insights")
 
 # Google GenAI - new SDK
 from google import genai
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY))
 
 
 # --------- Pydantic Models ----------
