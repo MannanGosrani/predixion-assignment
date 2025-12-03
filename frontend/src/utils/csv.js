@@ -76,6 +76,6 @@ export function downloadCsv(rows, filename = "export.csv") {
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-  a.remove();
+  a.remove();   
   URL.revokeObjectURL(url);
 }
