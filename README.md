@@ -2,7 +2,7 @@ Here is your **README.md** in perfect Markdown format — **you can directly pas
 
 ---
 
-# 🎧 Conversational Insights — Debt Collection Call Analysis
+# Conversational Insights — Debt Collection Call Analysis
 
 A full-stack application that analyzes call transcripts (single or batch CSV) and returns structured insights such as customer intent, sentiment, action required, and a concise summary.
 
