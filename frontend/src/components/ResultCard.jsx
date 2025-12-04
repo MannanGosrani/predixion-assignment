@@ -12,7 +12,7 @@ function FieldRow({ label, children }) {
 export default function ResultCard({ record }) {
   if (!record) return null
 
-  const insights = record.insights || record // support both shapes
+  const insights = record.insights || record 
   return (
     <div className="card">
       <div className="card-head">

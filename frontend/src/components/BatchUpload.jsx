@@ -29,7 +29,7 @@ export default function BatchUpload() {
 
         setRows(enriched);
 
-        // Process each transcript sequentially
+        // Processing each transcript sequentially
         for (let i = 0; i < enriched.length; i++) {
           enriched[i].status = "processing";
           setRows([...enriched]);
@@ -82,14 +82,12 @@ export default function BatchUpload() {
 
   return (
     <div style={{ width: "100%", marginTop: "2rem" }}>
-      {/* File Upload */}
       <div style={{ marginBottom: "1rem" }}>
         <input type="file" accept=".csv" onChange={handleCSVUpload} />
       </div>
 
       <h2 style={{ marginBottom: "1rem" }}>Batch Results</h2>
 
-      {/* Table Wrapper (full width + scrollable) */}
       <div style={{ width: "100%", overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "900px" }}>
           <thead>
@@ -148,7 +146,6 @@ export default function BatchUpload() {
         </table>
       </div>
 
-      {/* Details Modal */}
       {selectedRow && (
         <div style={modalOverlay}>
           <div style={modalBox}>
@@ -189,7 +186,6 @@ const td = {
   verticalAlign: "top"
 };
 
-// Modal styles
 const modalOverlay = {
   position: "fixed",
   top: 0,

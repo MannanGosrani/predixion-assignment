@@ -1,7 +1,7 @@
 export function parseCsvRows(text) {
   const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
 
-  // remove empty lines at start/end
+  // remove empty lines 
   while (lines.length && lines[0].trim() === "") lines.shift();
   while (lines.length && lines[lines.length - 1].trim() === "") lines.pop();
 

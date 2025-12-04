@@ -1,10 +1,6 @@
 import React, { useMemo } from "react";
 import { downloadCsv } from "../utils/csv";
 
-/**
- * BatchResults
- * - rows: array [{ id, transcript, status, insights, raw, error }]
- */
 export default function BatchResults({ rows = [], running }) {
   const ready = rows && rows.length > 0;
 
