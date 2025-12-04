@@ -1,91 +1,97 @@
 # Conversational Insights — Debt Collection Call Analysis
 
-A full-stack application that analyzes call transcripts (single or batch CSV) and returns structured insights such as customer intent, sentiment, action required, and a concise summary.
+A full-stack application that analyzes customer–agent call transcripts (single or batch CSV) and returns structured insights including intent, sentiment, action required, and a concise summary.
+Built as part of the Predixion AI Internship Technical Assignment.
 
 ---
 
 ## Overview
 
-This project was built as part of the Predixion assignment to demonstrate the ability to design a production-minded system capable of analyzing financial/debt-collection conversations.
-It processes both **single call transcripts** and **batch CSV uploads**, generating AI-powered insights with clean UI visualization.
+This project demonstrates an end-to-end AI pipeline for analyzing financial and debt-collection conversations. It supports both single transcript analysis and batch CSV processing, with a clean, responsive UI and fully deployed backend and frontend.
+
+The backend performs LLM-based structured extraction using Google Gemini Flash 2.0, while the frontend presents insights in an intuitive format.
 
 ---
 
 ## Features
 
-### **1. Single Transcript Analysis**
+### 1. Single Transcript Analysis
 
-Paste any call transcript (Hindi, English, or Hinglish) and receive:
+Paste any call transcript (English, Hindi, or Hinglish) and receive:
 
 * Customer intent
-* Sentiment score
-* Whether action is required
-* Summary of the conversation
+* Sentiment
+* Action required
+* Conversation summary
 
-### **2. Batch CSV Upload (Multiple Transcripts)**
+### 2. Batch CSV Upload (Multiple Transcripts)
 
-Upload a CSV containing:
+Upload a CSV with:
 
 ```
 id, transcript
 ```
 
-The app processes each transcript sequentially and displays:
+The system processes each transcript and displays:
 
-* Status (processing / done)
+* Processing status
 * Intent
 * Sentiment
 * Action required
 * Summary
-* Full transcript view
-* Exportable CSV output
+* Full transcript viewer
+* Downloadable CSV output
 
-### **3. Clean, Responsive UI**
+### 3. Clean, Responsive UI
 
 Includes:
 
 * Sidebar navigation
-* Insights panel
-* Batch upload section
+* Single-analysis panel
+* Batch upload workflow
 * Scrollable results table
+* Modal for detailed summary or transcript view
 
-### **4. Backend AI Processing**
+### 4. Backend AI Processing
 
-* Built with **FastAPI**
-* Uses **OpenAI GPT model** for insights extraction
-* Provides two API endpoints:
+* Built with FastAPI
+* Uses Google Gemini LLM for structured outputs
+* Provides two main endpoints:
 
-  * `/analyze` — single transcript
-  * `/analyze_csv` — batch CSV
+  * `/analyze` for single transcript
+  * `/analyze_csv` for batch CSV processing
 
-### **5. Deployment**
+---
 
-* **Frontend deployed on Vercel**
-* **Backend deployed on Railway**
+## Deployment
+
+* Frontend (Vercel): [https://predixion-assignment.vercel.app/](https://predixion-assignment.vercel.app/)
+* Backend API (Swagger UI on Railway): [https://predixion-assignment-production.up.railway.app/docs](https://predixion-assignment-production.up.railway.app/docs)
 
 ---
 
 ## Tech Stack
 
-### **Frontend**
+### Frontend
 
 * React (Vite)
 * Tailwind / custom CSS
-* Fetch API for backend communication
-* Vercel analytics support
+* Fetch API
+* Vercel deployment
 
-### **Backend**
+### Backend
 
 * FastAPI
 * Python
-* python-multipart (file handling)
-* OpenAI SDK
+* asyncpg (PostgreSQL)
+* python-multipart for file handling
+* Google Gemini Flash 2.0
+* Railway deployment
 
-### **DevOps**
+### Other
 
 * GitHub for version control
-* Vercel for frontend hosting
-* Railway for backend hosting
+* Railway PostgreSQL for persistence
 
 ---
 
@@ -95,17 +101,19 @@ Includes:
 predixion-assignment/
 │
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── TranscriptForm.jsx
-│   │   │   ├── ResultCard.jsx
-│   │   │   ├── BatchUpload.jsx
-│   │   ├── App.jsx
-│   │   ├── api.js
-│   └── ...
+│   └── src/
+│       ├── components/
+│       │   ├── TranscriptForm.jsx
+│       │   ├── ResultCard.jsx
+│       │   ├── BatchUpload.jsx
+│       ├── App.jsx
+│       ├── api.js
+│       └── ...
 │
 └── backend/
     ├── main.py
+    ├── models.py
+    ├── database.py
     ├── requirements.txt
     └── ...
 ```
@@ -114,7 +122,7 @@ predixion-assignment/
 
 ## API Endpoints
 
-### **POST /analyze**
+### POST /analyze
 
 Request:
 
@@ -135,18 +143,17 @@ Response:
 }
 ```
 
----
-
-### **POST /analyze_csv**
+### POST /analyze_csv
 
 * Accepts a CSV file
-* Returns an array of structured results
+* Returns an array of structured outputs
+* Individual row failures do not break the entire batch
 
 ---
 
 ## Running Locally
 
-### **1. Backend**
+### 1. Backend
 
 ```bash
 cd backend
@@ -154,7 +161,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-### **2. Frontend**
+### 2. Frontend
 
 ```bash
 cd frontend
@@ -166,26 +173,22 @@ npm run dev
 
 ## How It Works
 
-1. User uploads/pastes transcript(s)
-2. Frontend sends request to backend
-3. Backend feeds transcript into GPT model
-4. GPT extracts:
-
-   * Intent
-   * Sentiment
-   * Summary
-   * Action requirement
-5. Results are sent back to frontend
-6. UI renders clean insight cards and batch tables
+1. The user submits transcripts through the frontend.
+2. The frontend sends requests to FastAPI endpoints.
+3. The backend sends transcripts to Gemini using a structured-output prompt.
+4. The LLM returns intent, sentiment, action requirement, and summary.
+5. The backend returns structured JSON to the UI.
+6. The UI displays insights and tables for batch results.
+7. Data is stored in PostgreSQL for persistence.
 
 ---
 
 ## Batch Processing Flow
 
-* CSV is parsed in the browser (PapaParse)
-* Each transcript is sent to backend
-* UI dynamically updates each row
-* Full results become available for export
+* CSV is parsed in the browser using PapaParse.
+* Each transcript is sent individually to the backend.
+* The table updates dynamically as each result is processed.
+* Final results can be downloaded as a CSV.
 
 ---
 
@@ -193,33 +196,24 @@ npm run dev
 
 If batch upload fails:
 
-* Ensure CSV includes a **transcript** column
-* Remove extra commas or missing quotes
-* Check that backend URL is correct inside `api.js`
+* Ensure the CSV includes a transcript column
+* Remove invalid commas or unmatched quotes
+* Verify the backend URL in `api.js`
 
 ---
 
 ## Future Improvements
 
-* Authentication
-* Advanced sentiment scoring
-* Multi-language speech-to-text integration
-* Dashboard analytics
+* Authentication and user accounts
+* Multi-level sentiment scoring
+* Speech-to-text integration
+* Analytics dashboard for processed calls
 
 ---
 
 ## Author
 
 **Mannan Gosrani**
-BTech Computer Engineering — NMIMS MPSTME
-Skilled in Python, JavaScript, ML, Web Development, NLP
+BTech Computer Engineering, NMIMS MPSTME
+Skills: Python, JavaScript, NLP, Web Development, Data Engineering
 
----
-
-## If you like this project…
-
-Feel free to star the repository or share feedback!
-
----
-
-Let me know if you want your README enriched with images, architecture diagrams, badges, or GIF demos.
